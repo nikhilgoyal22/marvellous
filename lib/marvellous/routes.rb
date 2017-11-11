@@ -1,6 +1,6 @@
 module Marvellous
   ROUTES = {
-    'characters': '/characters',
-    'character': '/characters/:id'
+    'characters': {path: '/characters', collection: true},
+    'character': {path: '/characters/:id'}
   }
 end

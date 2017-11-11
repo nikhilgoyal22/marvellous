@@ -11,7 +11,7 @@ module Marvellous
       case response.code
       when 200
         res = Response.new(response)
-        res['data']['results']
+        res['data']['results'] rescue res
       else
         InvalidResponse.new(response)
       end

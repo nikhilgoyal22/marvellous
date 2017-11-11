@@ -7,6 +7,9 @@ module Marvellous
 
     class InvalidRouteError < StandardError; end
 
+    DEF_PAGE_SIZE = 10
+    DEF_PAGE_NUM = 1
+
     def initialize(options)
       @public_key = options[:public_key]
       @private_key = options[:private_key]
@@ -31,6 +34,23 @@ module Marvellous
       end
     end
 
+    def paginate(options)
+      return {} if options[:paginate] == false
+      page_num = options[:page_num] || DEF_PAGE_NUM
+      page_size = options[:page_size] || DEF_PAGE_SIZE
+      {offset: (page_num-1)*page_size, limit: page_size}
+    end
+
+    def build_uri(method, params={})
+      endpoint = "#{routes[method][:path]}"
+      if params.any?
+        params.each do |p_key, p_value|
+          endpoint.gsub!(":#{p_key.to_s}", p_value.to_s)
+        end
+      end
+      endpoint
+    end
+
     def build_response_object(response)
       Response.create(response)
     end
@@ -45,14 +65,10 @@ module Marvellous
 
     def method_missing(method, *args, &block)
       if routes.keys.include?(method)
-        endpoint = "#{routes[method]}"
-        params = *args
-        if params.any?
-          params[0].each do |p_key, p_value|
-            endpoint.gsub!(":#{p_key.to_s}", p_value.to_s)
-          end
-        end
-        response = fetch_response(endpoint)
+        params = args[0] || {}
+        endpoint = build_uri(method, params)
+        page_hash = (routes[method][:collection] rescue false) ? paginate(params) : {}
+        response = fetch_response(endpoint, page_hash)
         build_response_object(response)
       else
         raise InvalidRouteError, "#{method} is not defined in the routes."
