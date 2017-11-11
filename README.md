@@ -26,7 +26,7 @@ and a private key, you'll need them both to configure and instantiate a client).
 ### Instantiate a client
 
 ```ruby
-client = Marvelite::API::Client.new( :public_key => 'abcd1234', :private_key => '5678efgh')
+client = Marvellous::Client.new( :public_key => 'abcd1234', :private_key => '5678efgh')
 
 # fetch a list of characters (https://developer.marvel.com/docs#!/public/getCreatorCollection_get_0)
 client.characters # by default pagination of 10 items is implemented
